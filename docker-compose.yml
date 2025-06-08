@@ -55,7 +55,7 @@ services:
       - ZAP_API_KEY=
       - ZAP_HOST=zap
       - ZAP_PORT=8080
-      - TARGET_URL=https://example.com  # modifie ici ta cible
+      - TARGET_URL
     volumes:
       - ./results:/app/results
     working_dir: /app
