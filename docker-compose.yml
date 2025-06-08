@@ -45,7 +45,7 @@ services:
 
   zapscanner:
     build:
-      context: ./Zap-Owasp
+      context: ./Zap-Owsap
       dockerfile: Dockerfile
     container_name: zapscanner
     depends_on:
