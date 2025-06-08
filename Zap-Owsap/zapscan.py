@@ -6,14 +6,14 @@ import datetime
 import json
 
 def main():
-    target = os.getenv("TARGET_URL")
-    if not target:
-        print("❌ Veuillez définir TARGET_URL en variable d'environnement.")
+    if len(sys.argv) < 2:
+        print("❌ Usage : docker run ... <target_url>")
         sys.exit(1)
 
+    target = sys.argv[1]
+
     zap_api_key = os.getenv("ZAP_API_KEY", "")
-    # Ici on met 'zap' qui est le nom du service dans docker-compose, dans le même réseau
-    zap_host = os.getenv("ZAP_HOST", "zap")
+    zap_host = os.getenv("ZAP_HOST", "zap")  # host du service ZAP (nom docker ou localhost)
     zap_port = os.getenv("ZAP_PORT", "8080")
 
     zap = ZAPv2(apikey=zap_api_key,
@@ -40,7 +40,7 @@ def main():
 
     safe_target = target.replace("https://", "").replace("http://", "").replace("/", "_")
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    filename = f"/app/results/zap-result-{safe_target}-{timestamp}.json"
+    filename = f"/zap/wrk/zap-result-{safe_target}-{timestamp}.json"
 
     with open(filename, "w") as f:
         json.dump(alerts, f, indent=2)
