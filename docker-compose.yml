@@ -28,7 +28,7 @@ services:
     network_mode: "host"
 
   zap:
-    image: image: owasp/zap2docker-release
+    image: owasp/zap2docker-release
     container_name: zap
     command: ["zap.sh", "-daemon", "-host", "0.0.0.0", "-port", "8080", "-config", "api.disablekey=true"]
     ports:
