@@ -43,26 +43,6 @@ services:
       timeout: 5s
       retries: 5
 
-  zapscanner:
-    build:
-      context: ./Zap-Owsap
-      dockerfile: Dockerfile
-    container_name: zapscanner
-    depends_on:
-      zap:
-        condition: service_healthy
-    environment:
-      - ZAP_API_KEY=
-      - ZAP_HOST=zap
-      - ZAP_PORT=8080
-      - TARGET_URL
-    volumes:
-      - ./results:/app/results
-    working_dir: /app
-    entrypoint: ["python3", "zapscan.py"]
-    networks:
-      - secnet
-
 networks:
   secnet:
     driver: bridge
