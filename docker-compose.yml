@@ -53,6 +53,7 @@ services:
         condition: service_healthy
     environment:
       - TARGET_URL
+      - ZAP_API_URL=http://zap:8080
     volumes:
       - ./results:/app/results
     networks:
