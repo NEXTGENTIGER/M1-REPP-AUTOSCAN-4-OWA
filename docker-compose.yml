@@ -43,6 +43,23 @@ services:
       timeout: 5s
       retries: 5
 
+  zapscanner:
+    build:
+      context: ./zapscanner
+      dockerfile: Dockerfile
+    container_name: zapscanner
+    depends_on:
+      zap:
+        condition: service_healthy
+    environment:
+      - TARGET_URL
+      - ZAP_HOST=zap
+      - ZAP_PORT=8080
+    volumes:
+      - ./results:/app/results
+    networks:
+      - secnet
+
 networks:
   secnet:
     driver: bridge
