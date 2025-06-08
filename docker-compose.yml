@@ -56,7 +56,7 @@ services:
     volumes:
       - ./results:/app/results
     networks:
-      - secnet
+      - zapnet
 
 networks:
   secnet:
