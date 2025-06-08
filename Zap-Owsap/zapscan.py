@@ -40,7 +40,7 @@ def main():
 
     safe_target = target.replace("https://", "").replace("http://", "").replace("/", "_")
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    filename = f"/zap/wrk/zap-result-{safe_target}-{timestamp}.json"
+    filename = filename = f"/app/results/zap-result-{target}-{timestamp}.json"
 
     with open(filename, "w") as f:
         json.dump(alerts, f, indent=2)
