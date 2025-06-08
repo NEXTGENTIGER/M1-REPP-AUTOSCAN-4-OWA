@@ -27,6 +27,17 @@ services:
       - NET_ADMIN
     network_mode: "host"
 
+  zap:
+    image: owasp/zap2docker-stable
+    container_name: zap
+    command: zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./results:/zap/wrk  # pour monter results dans zap
+    networks:
+      - secnet
+
 networks:
   secnet:
     driver: bridge
