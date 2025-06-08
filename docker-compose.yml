@@ -25,7 +25,7 @@ services:
     cap_add:
       - NET_RAW
       - NET_ADMIN
-    network_mode: "host"  # tu peux garder si besoin accès réseau direct
+    network_mode: "host"
 
   zap:
     image: owasp/zap2docker-stable
