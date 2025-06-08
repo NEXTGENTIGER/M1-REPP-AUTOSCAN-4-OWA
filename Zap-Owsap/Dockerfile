@@ -1,15 +1,20 @@
-# Base image avec Python 3.11
+# Base image Python légère
 FROM python:3.11-slim
 
-# Installer dépendances système (curl pour tester la connectivité)
+# Met à jour les paquets et installe curl (utile pour healthcheck éventuel)
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Installer la lib Python ZAP
-RUN pip install python-owasp-zap-v2.4
-
-# Copier le script dans le container
-COPY zapscan.py /app/zapscan.py
-
+# Crée un dossier de travail
 WORKDIR /app
 
-CMD ["python", "zapscan.py"]
+# Copie les fichiers nécessaires dans le container
+COPY zapscan.py /app/
+
+# Installe la librairie zapv2 pour interagir avec ZAP API
+RUN pip install --no-cache-dir python-owasp-zap-v2.4
+
+# Volume pour résultats (facultatif ici, tu peux monter depuis docker-compose)
+VOLUME ["/app/results"]
+
+# Commande par défaut, attends que TARGET_URL soit passé via variable d'env
+ENTRYPOINT ["python3", "zapscan.py"]
