@@ -1,63 +1,61 @@
-import time
-import json
-import sys
 import os
-import datetime
+import sys
+import time
 from zapv2 import ZAPv2
+import datetime
+import json
 
 def main():
-    target = None
-
-    # Prendre la cible en argument ou via variable d'environnement
-    if len(sys.argv) >= 2:
-        target = sys.argv[1]
-    else:
-        target = os.getenv('TARGET_URL')
-
+    # Récupération de la cible depuis la variable d'environnement
+    target = os.getenv("TARGET_URL")
     if not target:
-        print("Usage : python zapscan.py <url>  ou définir la variable d'environnement TARGET_URL")
+        print("❌ Veuillez définir TARGET_URL en variable d'environnement.")
         sys.exit(1)
 
-    # Récupérer variables d'environnement pour ZAP API
-    zap_api_key = os.getenv('ZAP_API_KEY', '')
-    zap_host = os.getenv('ZAP_HOST', 'localhost')
-    zap_port = os.getenv('ZAP_PORT', '8080')
+    # Configuration ZAP
+    zap_api_key = os.getenv("ZAP_API_KEY", "")
+    zap_host = os.getenv("ZAP_HOST", "host.docker.internal")
+    zap_port = os.getenv("ZAP_PORT", "8080")
 
-    proxies = {
-        'http': f'http://{zap_host}:{zap_port}',
-        'https': f'http://{zap_host}:{zap_port}'
-    }
+    # Création de l'objet ZAPv2 avec proxy sur le daemon ZAP
+    zap = ZAPv2(apikey=zap_api_key,
+                proxies={"http": f"http://{zap_host}:{zap_port}",
+                         "https": f"http://{zap_host}:{zap_port}"})
 
-    zap = ZAPv2(apikey=zap_api_key, proxies=proxies)
+    print(f"▶️ Début du scan OWASP ZAP sur la cible : {target}")
 
-    print(f"🔍 Lancement du scan actif sur {target} via ZAP API {zap_host}:{zap_port}...")
-
-    # Accéder à la cible pour initier le crawl
+    # Ouvrir la cible dans ZAP (préparer la session)
     zap.urlopen(target)
-    time.sleep(2)  # Pause pour que ZAP charge la page
+
+    # Pause pour que le site soit bien accessible avant scan
+    print("⏳ Attente que la cible soit accessible...")
+    time.sleep(5)
 
     # Lancer le scan actif
+    print("🚀 Lancement du scan actif...")
     scan_id = zap.ascan.scan(target)
 
+    # Suivre la progression du scan actif
     while int(zap.ascan.status(scan_id)) < 100:
-        print(f"Progression du scan actif : {zap.ascan.status(scan_id)}%")
+        progress = zap.ascan.status(scan_id)
+        print(f"🔄 Progression du scan : {progress}%")
         time.sleep(5)
 
-    print("✅ Scan actif terminé.")
+    print("✅ Scan actif terminé. Récupération des résultats...")
 
-    # Récupérer les alertes
+    # Récupérer les alertes détectées
     alerts = zap.core.alerts(baseurl=target)
 
-    # Sauvegarder les résultats dans ./results
-    os.makedirs("./results", exist_ok=True)
+    # Préparer nom de fichier horodaté
+    safe_target = target.replace("https://", "").replace("http://", "").replace("/", "_")
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    safe_target = target.replace("://", "_").replace("/", "_")
-    output_file = f"./results/zap-result-{safe_target}-{timestamp}.json"
+    filename = f"/app/results/zap-result-{safe_target}-{timestamp}.json"
 
-    with open(output_file, "w") as f:
+    # Sauvegarder le rapport JSON
+    with open(filename, "w") as f:
         json.dump(alerts, f, indent=2)
 
-    print(f"💾 Résultats sauvegardés dans : {output_file}")
+    print(f"💾 Rapport sauvegardé dans : {filename}")
 
 if __name__ == "__main__":
     main()
