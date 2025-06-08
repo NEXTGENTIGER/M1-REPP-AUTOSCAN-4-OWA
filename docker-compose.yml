@@ -35,8 +35,7 @@ services:
       - "8080:8080"
     volumes:
       - ./results:/zap/wrk
-    networks:
-      - secnet
+    network_mode: "host"
     healthcheck:
       test: ["CMD", "curl", "-s", "http://localhost:8080"]
       interval: 10s
