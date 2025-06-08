@@ -53,8 +53,6 @@ services:
         condition: service_healthy
     environment:
       - TARGET_URL
-      - ZAP_HOST=zap
-      - ZAP_PORT=8080
     volumes:
       - ./results:/app/results
     networks:
