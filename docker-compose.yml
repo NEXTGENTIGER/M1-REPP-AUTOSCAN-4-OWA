@@ -25,7 +25,7 @@ services:
     cap_add:
       - NET_RAW
       - NET_ADMIN
-    network_mode: "host"
+    network_mode: host
 
   zap:
     image: zaproxy/zap-stable
@@ -67,6 +67,20 @@ services:
       - ./results:/app/results
     networks:
       - zapnet
+
+  forensiclab:
+    build:
+      context: ./Forensic
+      dockerfile: Dockerfile
+    container_name: forensiclab
+    volumes:
+      - ./samples:/data:ro      # Dossier source des fichiers à analyser
+      - ./rules:/rules:ro       # Règles YARA
+      - ./results:/output       # Dossier des résultats JSON
+    working_dir: /Forensic
+    entrypoint: [ "tail", "-f", "/dev/null" ]  # Garde le conteneur ouvert pour exécution manuelle
+    networks:
+      - secnet
 
 networks:
   secnet:
